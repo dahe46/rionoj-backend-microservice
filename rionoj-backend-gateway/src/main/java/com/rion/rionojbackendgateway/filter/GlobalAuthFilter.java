@@ -3,6 +3,7 @@ package com.rion.rionojbackendgateway.filter;
 import cn.hutool.core.text.AntPathMatcher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 
 @Component
-public class GlobalAuthFilter implements GlobalFilter {
+public class GlobalAuthFilter implements GlobalFilter, Ordered {
 
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
     @Override
@@ -30,5 +31,10 @@ public class GlobalAuthFilter implements GlobalFilter {
             return response.writeWith(Mono.just(dataBuffer));
         }
         return chain.filter(exchange);
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 }
