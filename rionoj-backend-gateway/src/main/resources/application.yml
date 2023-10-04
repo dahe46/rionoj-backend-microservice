@@ -22,21 +22,6 @@ spring:
           uri: lb://rionoj-backend-judge-service
           predicates:
             - Path=/api/judge/**
-    globalcors: # 全局跨域处理
-      add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
-      cors-configurations:
-        '[/**]':
-          allowedOrigins: # 允许哪些ip进行跨域
-            - "Http://localhost:5173"
-          allowedMethods: # 允许哪些请求方法跨域
-            - "GET"
-            - "POST"
-            - "PUT"
-            - "DELETE"
-            - "OPTIONS"
-          allowedHeaders: "*" # 允许在请求中携带的头信息
-          allowedCredentials: true # 是否允许携带cookie
-          maxAge: 1800 # 这次跨域检测的有效期限
   main:
     web-application-type: reactive
 knife4j:
