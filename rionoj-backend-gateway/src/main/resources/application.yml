@@ -1,0 +1,53 @@
+server:
+  address: 127.0.0.1
+  port: 9001
+spring:
+  application:
+    name: rionoj-backend-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: rionoj-backend-user-service
+          uri: lb://rionoj-backend-user-service
+          predicates:
+            - Path=/api/user/**
+        - id: rionoj-backend-question-service
+          uri: lb://rionoj-backend-question-service
+          predicates:
+            - Path=/api/question/**
+        - id: rionoj-backend-judge-service
+          uri: lb://rionoj-backend-judge-service
+          predicates:
+            - Path=/api/judge/**
+    globalcors: # 全局跨域处理
+      add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
+      cors-configurations:
+        '[/**]':
+          allowedOrigins: # 允许哪些ip进行跨域
+            - "Http://localhost:5173"
+          allowedMethods: # 允许哪些请求方法跨域
+            - "GET"
+            - "POST"
+            - "PUT"
+            - "DELETE"
+            - "OPTIONS"
+          allowedHeaders: "*" # 允许在请求中携带的头信息
+          allowedCredentials: true # 是否允许携带cookie
+          maxAge: 1800 # 这次跨域检测的有效期限
+  main:
+    web-application-type: reactive
+knife4j:
+  gateway:
+    enabled: true
+    # 指定服务发现的模式聚合微服务文档
+    strategy: discover
+    discover:
+      enabled: true
+      # 指定版本号(Swagger2|OpenAPI3)
+      version : swagger2
+      # 需要排除的微服务(eg:网关服务)
+      excluded-services:
+        - rionoj-backend-gateway
