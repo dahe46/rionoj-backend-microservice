@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 * @description 针对表【question(题目)】的数据库操作Service
 * @date 2023-09-06
 */
-@FeignClient(name = "rionoj-backend-question-service", path = "/api/question")
+@FeignClient(name = "rionoj-backend-question-service", path = "/api/question/inner")
 public interface QuestionFeignClient {
 
     /**
