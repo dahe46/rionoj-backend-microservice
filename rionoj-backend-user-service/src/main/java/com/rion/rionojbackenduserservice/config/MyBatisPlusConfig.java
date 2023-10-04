@@ -1,4 +1,4 @@
-package com.rion.rionojbackendcommon.config;
+package com.rion.rionojbackenduserservice.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
