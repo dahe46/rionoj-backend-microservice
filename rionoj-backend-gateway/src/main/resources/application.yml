@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: rionoj-backend-gateway
+  redis:
+    database: 1
+    host: localhost
+    port: 6379
+    timeout: 5000
   cloud:
     nacos:
       discovery:

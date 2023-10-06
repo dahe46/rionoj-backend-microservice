@@ -22,9 +22,7 @@ import com.rion.rionojbackendquestionservice.mapper.QuestionSubmitMapper;
 import com.rion.rionojbackendquestionservice.rabbitmq.MyMessageProducer;
 import com.rion.rionojbackendquestionservice.service.QuestionService;
 import com.rion.rionojbackendquestionservice.service.QuestionSubmitService;
-import com.rion.rionojbackendserviceclient.service.JudgeFeignClient;
 import com.rion.rionojbackendserviceclient.service.UserFeignClient;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,18 +42,15 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private QuestionService questionService;
     @Resource
     private UserFeignClient userFeignClient;
-    @Lazy
-    @Resource
-    private JudgeFeignClient judgeFeignClient;
     @Resource
     private MyMessageProducer myMessageProducer;
 
     /**
      * 题目提交
      *
-     * @param questionSubmitAddRequest
-     * @param loginUser
-     * @return
+     * @param questionSubmitAddRequest 题目提交添加请求
+     * @param loginUser                登录用户
+     * @return long
      */
     @Override
     public long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
@@ -87,17 +82,14 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         Long questionSubmitId = questionSubmit.getId();
         // 发送消息
         myMessageProducer.sendMessage("oj_exchange", "oj_routingKey", String.valueOf(questionSubmitId));
-//        CompletableFuture.runAsync(() -> {
-//            judgeFeignClient.doJudge(questionSubmitId);
-//        });
         return questionSubmitId;
     }
 
     /**
      * 获取查询包装类（用户根据哪些字段查询，根据前端传来的请求对象，得到 mybatis 框架支持的查询 QueryWrapper 类）
      *
-     * @param questionSubmitQueryRequest
-     * @return
+     * @param questionSubmitQueryRequest 题目提交查询请求
+     * @return {@code QueryWrapper<QuestionSubmit>}
      */
     @Override
     public QueryWrapper<QuestionSubmit> getQueryWrapper(QuestionSubmitQueryRequest questionSubmitQueryRequest) {
@@ -124,30 +116,34 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     }
 
     /**
-     * 获取questionsubmitvo
+     * 获取提交题目脱敏信息
      *
-     * @param questionSubmit
-     * @param loginUser
-     * @return {@link QuestionSubmitVO}
+     * @param questionSubmit 题目提交
+     * @param loginUser      登录用户
+     * @return {@code QuestionSubmitVO}
      */
     @Override
     public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser) {
         QuestionSubmitVO questionSubmitVO = QuestionSubmitVO.objToVo(questionSubmit);
-        // 脱敏：仅本人和管理员能看见自己（提交 userId 和登录用户 id 不同）提交的代码
-        long userId = loginUser.getId();
-        // 处理脱敏
-        if (userId != questionSubmit.getUserId() && !userFeignClient.isAdmin(loginUser)) {
+        if (loginUser == null) {
             questionSubmitVO.setCode(null);
+        } else {
+            // 脱敏：仅本人和管理员能看见自己（提交 userId 和登录用户 id 不同）提交的代码
+            long userId = loginUser.getId();
+            // 处理脱敏
+            if (userId != questionSubmit.getUserId() && !userFeignClient.isAdmin(loginUser)) {
+                questionSubmitVO.setCode(null);
+            }
         }
         return questionSubmitVO;
     }
 
     /**
-     * 获取questionsubmitvopage
+     * 获取提交题目脱敏信息
      *
-     * @param questionSubmitPage
-     * @param loginUser
-     * @return {@link Page}<{@link QuestionSubmitVO}>
+     * @param questionSubmitPage 题目提交页面
+     * @param loginUser          登录用户
+     * @return {@code Page<QuestionSubmitVO>}
      */
     @Override
     public Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser) {

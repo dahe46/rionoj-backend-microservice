@@ -5,7 +5,12 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rion.rionojbackendcommon.common.ErrorCode;
 import com.rion.rionojbackendcommon.constant.CommonConstant;
+import com.rion.rionojbackendcommon.constant.HttpConstant;
+import com.rion.rionojbackendcommon.constant.RedisConstant;
+import com.rion.rionojbackendcommon.constant.RedisKey;
 import com.rion.rionojbackendcommon.exception.BusinessException;
+import com.rion.rionojbackendcommon.utils.JwtUtils;
+import com.rion.rionojbackendcommon.utils.RedisUtils;
 import com.rion.rionojbackendcommon.utils.SqlUtils;
 import com.rion.rionojbackendmodel.model.dto.user.UserQueryRequest;
 import com.rion.rionojbackendmodel.model.entity.User;
@@ -23,9 +28,8 @@ import org.springframework.util.DigestUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.rion.rionojbackendcommon.constant.UserConstant.USER_LOGIN_STATE;
 
 
 /**
@@ -103,65 +107,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-        // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return this.getLoginUserVO(user);
+        Long id = user.getId();
+        String key = RedisKey.getKey(RedisConstant.USER_TOKEN_KEY, id.toString());
+        // 生成Token
+        String token = JwtUtils.createToken(id);
+        // 3. 将Token存入redis(string 类型)
+        RedisUtils.set(key, token, RedisConstant.TOKEN_EXPIRED, TimeUnit.MINUTES);
+
+        LoginUserVO loginUserVO = this.getLoginUserVO(user);
+        loginUserVO.setToken(token);
+        return loginUserVO;
     }
 
-    /**
-     * 获取当前登录用户
-     *
-     * @param request
-     * @return
-     */
     @Override
     public User getLoginUser(HttpServletRequest request) {
-        // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null || currentUser.getId() == null) {
+        // 从数据库查询
+        String token = request.getHeader(HttpConstant.TOKEN_HEADER_NAME);
+        Long userId = JwtUtils.getId(token);
+        String key = RedisKey.getKey(RedisConstant.USER_TOKEN_KEY, userId.toString());
+        String redisToken = RedisUtils.get(key);
+        if (!StringUtils.isNotEmpty(redisToken)) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
-        currentUser = this.getById(userId);
+        User currentUser = this.getById(userId);
         if (currentUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         return currentUser;
     }
 
-    /**
-     * 获取当前登录用户（允许未登录）
-     *
-     * @param request
-     * @return
-     */
     @Override
     public User getLoginUserPermitNull(HttpServletRequest request) {
-        // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null || currentUser.getId() == null) {
-            return null;
-        }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
+        String token = request.getHeader(HttpConstant.TOKEN_HEADER_NAME);
+        Long userId = JwtUtils.getId(token);
         return this.getById(userId);
     }
 
-    /**
-     * 是否为管理员
-     *
-     * @param request
-     * @return
-     */
     @Override
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        return isAdmin(user);
+        String token = request.getHeader(HttpConstant.TOKEN_HEADER_NAME);
+        Long userId = JwtUtils.getId(token);
+        User currentUser = this.getById(userId);
+        return isAdmin(currentUser);
     }
 
     @Override
@@ -169,18 +157,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
 
-    /**
-     * 用户注销
-     *
-     * @param request
-     */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
-        }
+        String token = request.getHeader(HttpConstant.TOKEN_HEADER_NAME);
         // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        Long id = JwtUtils.getId(token);
+        String key = RedisKey.getKey(RedisConstant.USER_TOKEN_KEY, id.toString());
+        RedisUtils.deleteKey(key);
         return true;
     }
 
@@ -218,7 +201,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
         Long id = userQueryRequest.getId();
-        String unionId = userQueryRequest.getUnionId();
         String mpOpenId = userQueryRequest.getMpOpenId();
         String userName = userQueryRequest.getUserName();
         String userProfile = userQueryRequest.getUserProfile();
@@ -227,7 +209,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String sortOrder = userQueryRequest.getSortOrder();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
-        queryWrapper.eq(StringUtils.isNotBlank(unionId), "unionId", unionId);
         queryWrapper.eq(StringUtils.isNotBlank(mpOpenId), "mpOpenId", mpOpenId);
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
         queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);

@@ -4,6 +4,7 @@ import com.rion.rionojbackendmodel.model.codesandbox.ExecuteCodeReps;
 import com.rion.rionojbackendmodel.model.codesandbox.ExecuteCodeReq;
 
 /**
+ * 代码沙箱
  * 代码沙箱接口
  *
  * @author Rion
@@ -15,7 +16,7 @@ public interface CodeSandbox {
      * 执行代码
      *
      * @param executeCodeReq 执行代码请求信息
-     * @return {@link ExecuteCodeReps}
+     * @return {@code ExecuteCodeReps}
      */
     ExecuteCodeReps executeCode(ExecuteCodeReq executeCodeReq);
 }

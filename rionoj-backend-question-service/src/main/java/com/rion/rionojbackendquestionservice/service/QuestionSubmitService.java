@@ -18,37 +18,37 @@ import com.rion.rionojbackendmodel.model.vo.QuestionSubmitVO;
 public interface QuestionSubmitService extends IService<QuestionSubmit> {
 
     /**
-     * 提交
+     * 题目提交
      *
-     * @param questionId
-     * @param loginUser
-     * @return
+     * @param questionId 题目 id
+     * @param loginUser  登录用户
+     * @return long
      */
     long doQuestionSubmit(QuestionSubmitAddRequest questionId, User loginUser);
 
     /**
      * 获取查询条件
      *
-     * @param questionSubmitQueryRequest
-     * @return
+     * @param questionSubmitQueryRequest 题目提交查询请求
+     * @return {@code QueryWrapper<QuestionSubmit>}
      */
     QueryWrapper<QuestionSubmit> getQueryWrapper(QuestionSubmitQueryRequest questionSubmitQueryRequest);
 
     /**
      * 获取题目封装
      *
-     * @param questionSubmit
-     * @param loginUser
-     * @return
+     * @param questionSubmit 题目提交
+     * @param loginUser      登录用户
+     * @return {@code QuestionSubmitVO}
      */
     QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser);
 
     /**
      * 分页获取题目封装
      *
-     * @param questionSubmitPage
-     * @param loginUser
-     * @return
+     * @param questionSubmitPage 提交题目分页
+     * @param loginUser          登录用户
+     * @return {@code Page<QuestionSubmitVO>}
      */
     Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser);
 

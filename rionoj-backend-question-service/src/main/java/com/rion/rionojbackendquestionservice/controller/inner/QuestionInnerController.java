@@ -24,8 +24,8 @@ public class QuestionInnerController implements QuestionFeignClient {
     /**
      * 根据 id 获取题目信息
      *
-     * @param questionId
-     * @return {@link Question}
+     * @param questionId 题目 id
+     * @return {@code Question}
      */
     @Override
     @GetMapping("/get/id")
@@ -36,8 +36,8 @@ public class QuestionInnerController implements QuestionFeignClient {
     /**
      * 根据 id 获取题目提交信息
      *
-     * @param questionSubmitId
-     * @return {@link QuestionSubmit}
+     * @param questionSubmitId 提交题目 id
+     * @return {@code QuestionSubmit}
      */
     @Override
     @GetMapping("/question_submit/get/id")
@@ -48,7 +48,7 @@ public class QuestionInnerController implements QuestionFeignClient {
     /**
      * 更新题目提交信息
      *
-     * @param questionSubmit
+     * @param questionSubmit 题目提交
      * @return boolean
      */
     @Override

@@ -10,8 +10,9 @@ public interface JudgeService {
 
     /**
      * 判题
-     * @param questionSubmitId
-     * @return
+     *
+     * @param questionSubmitId 提交题目 id
+     * @return {@code QuestionSubmit}
      */
     QuestionSubmit doJudge(long questionSubmitId);
 

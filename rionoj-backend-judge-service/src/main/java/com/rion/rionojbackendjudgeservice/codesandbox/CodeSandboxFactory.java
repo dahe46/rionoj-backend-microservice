@@ -15,7 +15,7 @@ public class CodeSandboxFactory {
      * 创建代码沙箱实例
      *
      * @param type 沙箱类型
-     * @return {@link CodeSandbox}
+     * @return {@code CodeSandbox}
      */
     public static CodeSandbox newInstance(String type) {
         switch (type) {

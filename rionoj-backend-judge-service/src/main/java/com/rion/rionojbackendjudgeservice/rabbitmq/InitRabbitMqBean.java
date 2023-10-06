@@ -5,6 +5,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
@@ -12,6 +13,7 @@ import javax.annotation.PostConstruct;
  * 用于创建测试程序用到的交换机和队列（只用在程序启动前执行一次）
  */
 @Slf4j
+@Component
 public class InitRabbitMqBean {
 
     @Value("${spring.rabbitmq.host:localhost}")

@@ -19,25 +19,25 @@ public interface QuestionFeignClient {
     /**
      * 根据 id 获取题目信息
      *
-     * @param questionId
-     * @return {@link Question}
+     * @param questionId 题目 id
+     * @return {@code Question}
      */
     @GetMapping("/get/id")
     Question getQuestionById(@RequestParam("questionId") long questionId);
 
     /**
-     * 根据 id 获取题目提交信息
+     * 根据 id 获取提交题目信息
      *
-     * @param questionSubmitId
-     * @return {@link QuestionSubmit}
+     * @param questionSubmitId 提交题目 id
+     * @return {@code QuestionSubmit}
      */
     @GetMapping("/question_submit/get/id")
     QuestionSubmit getQuestionSubmitById(@RequestParam("questionSubmitId") long questionSubmitId);
 
     /**
-     * 更新题目提交信息
+     * 通过 ID 更新提交题目
      *
-     * @param questionSubmit
+     * @param questionSubmit 提交题目
      * @return boolean
      */
     @PostMapping("/question_submit/update")

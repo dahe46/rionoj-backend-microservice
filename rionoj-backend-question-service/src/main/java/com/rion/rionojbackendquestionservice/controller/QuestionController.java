@@ -31,6 +31,9 @@ import java.util.List;
 
 /**
  * 题目接口
+ *
+ * @author Rion
+ * @date 2023/09/06
  */
 @RestController
 @RequestMapping("/")
@@ -47,11 +50,11 @@ public class QuestionController {
     private final static Gson GSON = new Gson();
 
     /**
-     * 创建
+     * 添加题目
      *
-     * @param questionAddRequest
-     * @param request
-     * @return
+     * @param questionAddRequest 题目添加请求
+     * @param request            请求
+     * @return {@code BaseResponse<Long>}
      */
     @PostMapping("/add")
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
@@ -84,11 +87,11 @@ public class QuestionController {
     }
 
     /**
-     * 删除
+     * 删除题目
      *
-     * @param deleteRequest
-     * @param request
-     * @return
+     * @param deleteRequest 删除请求
+     * @param request       请求
+     * @return {@code BaseResponse<Boolean>}
      */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteQuestion(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
@@ -111,8 +114,8 @@ public class QuestionController {
     /**
      * 更新（仅管理员）
      *
-     * @param questionUpdateRequest
-     * @return
+     * @param questionUpdateRequest 题目更新请求
+     * @return {@code BaseResponse<Boolean>}
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -147,8 +150,9 @@ public class QuestionController {
     /**
      * 根据 id 获取
      *
-     * @param id
-     * @return
+     * @param id      题目 id
+     * @param request 请求
+     * @return {@code BaseResponse<Question>}
      */
     @GetMapping("/get")
     public BaseResponse<Question> getQuestionById(long id, HttpServletRequest request) {
@@ -169,8 +173,9 @@ public class QuestionController {
     /**
      * 根据 id 获取(脱敏数据)
      *
-     * @param id
-     * @return
+     * @param id      题目 id
+     * @param request 请求
+     * @return {@code BaseResponse<QuestionVO>}
      */
     @GetMapping("/get/vo")
     public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
@@ -188,9 +193,9 @@ public class QuestionController {
     /**
      * 分页获取列表（封装类）
      *
-     * @param questionQueryRequest
-     * @param request
-     * @return
+     * @param questionQueryRequest 题目查询请求
+     * @param request              请求
+     * @return {@code BaseResponse<Page<QuestionVO>>}
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
@@ -207,9 +212,9 @@ public class QuestionController {
     /**
      * 分页获取当前用户创建的资源列表
      *
-     * @param questionQueryRequest
-     * @param request
-     * @return
+     * @param questionQueryRequest 题目查询请求
+     * @param request              请求
+     * @return {@code BaseResponse<Page<QuestionVO>>}
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listMyQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
@@ -231,8 +236,8 @@ public class QuestionController {
     /**
      * 分页获取题目列表（仅管理员）
      *
-     * @param questionQueryRequest
-     * @return
+     * @param questionQueryRequest 题目查询请求
+     * @return {@code BaseResponse<Page<Question>>}
      */
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -247,9 +252,9 @@ public class QuestionController {
     /**
      * 编辑（用户）
      *
-     * @param questionEditRequest
-     * @param request
-     * @return
+     * @param questionEditRequest 题目编辑请求
+     * @param request             请求
+     * @return {@code BaseResponse<Boolean>}
      */
     @PostMapping("/edit")
     public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
@@ -286,11 +291,12 @@ public class QuestionController {
     }
 
     /**
+     * 确实提交
      * 代码提交
      *
-     * @param questionSubmitAddRequest
-     * @param request
-     * @return resultNum 本次点赞变化数
+     * @param questionSubmitAddRequest 题目提交添加请求
+     * @param request                  请求
+     * @return {@code BaseResponse<Long>}
      */
     @PostMapping("/question_submit/do")
     public BaseResponse<Long> doSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
@@ -306,9 +312,9 @@ public class QuestionController {
     /**
      * 分页获取题目提交列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
      *
-     * @param questionSubmitQueryRequest
-     * @param request
-     * @return
+     * @param questionSubmitQueryRequest 题目提交查询请求
+     * @param request                    请求
+     * @return {@code BaseResponse<Page<QuestionSubmitVO>>}
      */
     @PostMapping("/question_submit/list/page")
     public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
