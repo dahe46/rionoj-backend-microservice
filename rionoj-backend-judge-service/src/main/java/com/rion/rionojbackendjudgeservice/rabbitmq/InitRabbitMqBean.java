@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * 用于创建测试程序用到的交换机和队列（只用在程序启动前执行一次）
+ * 创建MQ交换机和队列（只用在程序启动前执行一次）
  */
 @Slf4j
 @Component

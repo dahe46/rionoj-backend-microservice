@@ -35,7 +35,6 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1.获取请求参数
         ServerHttpRequest request = exchange.getRequest();
-//        ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
         if (antPathMatcher.match("/**/inner/**", path)) {
             ServerHttpResponse response = exchange.getResponse();
@@ -48,14 +47,13 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
         if (antPathMatcher.match("/**/v2/api-docs/**", path)) {
             return chain.filter(exchange);
         }
-        // 白名单放行
+        // 2.白名单放行
         if (WHITE_LIST.contains(path)) {
             return chain.filter(exchange);
         }
         // 取出token
         String token = request.getHeaders().getFirst(HttpConstant.TOKEN_HEADER_NAME);
-        // 验证token
-        // 3. 验证token
+        // 3.验证token
         if (token == null || token.isEmpty()) {
             return handleTokenValidationFailure(exchange, "Token is Null");
         }

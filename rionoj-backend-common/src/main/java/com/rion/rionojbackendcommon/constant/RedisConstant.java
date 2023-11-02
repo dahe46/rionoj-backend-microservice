@@ -15,11 +15,11 @@ public class RedisConstant {
     /**
      * 令牌续期时间
      */
-    public static final long TOKEN_RENEWAL_TIME  = 15L;
+    public static final long TOKEN_RENEWAL_TIME  = 20L;
 
     /**
      * 令牌有效期剩余时间
      */
-    public static final long TOKEN_REMAINDER = 5L;
+    public static final long TOKEN_REMAINDER = 10L;
 
 }
